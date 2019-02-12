@@ -1,0 +1,22 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Validate Scorecard') {
+            steps {
+                script {
+                    def validateScoreCardModule = load "jenkins/scripts/ValidateScorecard.groovy"
+                    def validateScoreCardGitUrl = input(
+                        id: 'validateScoreCardInput', message: 'Git repository URL:', parameters: [
+                        [$class: 'TextParameterDefinition', name: 'url']
+                    ])
+                    def validationResult = validateScoreCardModule.validate(validateScoreCardGitUrl)
+                    
+                    if(validationResult['error']) {
+                        error(validationResult['errorMessage'])
+                    }
+                }
+            }
+        }
+    }
+}
